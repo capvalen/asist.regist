@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset=utf-8 />
+<title>Registro de asistencias - Feria 13 SRL</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/backstretch.min.js"></script>
+<script type="text/javascript" src="js/timer.jquery.js"></script>
+<script>
+	$(document).ready(function(e) {
+	$('#tablatodo').hide();
+	$.backstretch([
+		"fondos/fondo1.jpg",
+		"fondos/fondo2.jpg",
+		"fondos/fondo3.jpg",
+		"fondos/fondo4.jpg",
+		"fondos/fondo5.jpg",
+		"fondos/fondo6.jpg",
+		"fondos/fondo7.jpg"
+		],{
+		fade:800,
+		duration:60000});
+		
+	});
+	function limpiar(){
+	document.getElementById("txtCodigo").value="";
+	document.getElementById("txtCodigo").focus();
+	//$('.cuadro_resultado').css("visibility","visible");
+	}
+	
+	function mostrarresultado(){
+	$('.cuadro_resultado').animate({height: '320px'},'slow');
+	$('#tablatodo').slideDown('slow');
+	}
+	
+	function borrarresultado(){
+	document.getElementById("txtCodigo").value="";
+	document.getElementById("txtCodigo").focus();
+	$('#lblTiempo').timer('remove');
+	$('#lblTiempo').timer({
+				duration:'10s',
+				callback: function(){//alert('mensaje');
+				$('#tablatodo').slideUp('slow');
+				$('.cuadro_resultado').animate({height: '20px'},'slow');
+				$('#tabladatos').text('--');
+				$('#turno').text('--');
+				$('#hora').text('--');
+				$('#minutotarde').text('--');
+				$('#lblTiempo').timer('remove');}
+			});
+	
+	}
+	
+</script>
+
+</head>
+<body onload="limpiar()" oncontextmenu="return false" onselectstart="return false"  ondragstart="return false" oncopy="return false">
+<script type="text/javascript" charset="utf-8">
+$('#txtCodigo').focus();
+		
+        $(document).keydown(function(tecla){
+            if (tecla.keyCode == 13) {
+				<!-- acepta el enter y deberia empezar a analizar si existe el CodBarras con php -->
+				$contador= document.getElementById("txtCodigo").value.length;
+				$codigo=document.getElementById("txtCodigo").value;
+				
+				<!-- alert($codigo); -->
+				if($contador>3){
+				
+				
+				$.ajax({
+					url: "comprobar.php",
+					dataType: 'json',
+					type: 'post',
+					cache: false,
+					data: {codigo: $codigo},
+					success: function(data1){
+						//alert(data[0]['regEntrada01']);
+						console.log(data1);
+						$estado=data1[0][0];
+						if ($estado=='no'){
+						//console.log('mal');
+						$('#tabladatos').text('Pase otra vez su tarjeta');
+						$('#tabladatos').css({fontSize: "25px", "font-weight":"bold", color: 'Crimson'});
+						$('#logos_estado').attr("src",'images/bad.png');
+						$('#logos_empresa').attr("src",'images/bad.png');
+						$('#turno').text('--');
+						$('#hora').text('--');
+						$('#minutotarde').text('--');
+						}else{
+						console.log('bien');
+						
+				
+					console.log('iniciando...');
+					$.ajax({
+						url: "registro.php",
+						dataType: 'json',
+						type: 'post',
+						cache: false,
+						data: {codigo: $codigo},
+						success: function(data){
+							//alert(data[0]['regEntrada01']);
+							console.log(data);
+							$('#tabladatos').text(data[0]['Nombre']);
+							$('#tabladatos').css({fontSize: "25px", "font-weight":"bold", color: 'White'});
+							$('#turno').text(data[0]['turno']);
+							$('#logos_estado').attr("src",'images/'+data[0]['usufoto']);
+							if(data[0]['turno']=='Entrada de manana'){
+								$('#hora').text(data[0]['regEntrada01']);
+								$('#minutotarde').text(data[0]['regtardanzadia']);
+							}else if(data[0]['turno']=='Salida de manana'){
+								$('#hora').text(data[0]['regSalida01']);
+								$('#minutotarde').text('Ninguno');
+							}else if(data[0]['turno']=='Entrada de tarde'){
+								$('#hora').text(data[0]['regEntrada02']);
+								$('#minutotarde').text(data[0]['regtardanzatarde']);
+							}else if(data[0]['turno']=='Salida de tarde'){
+								$('#hora').text(data[0]['regSalida02']);
+								$('#minutotarde').text('Ninguno');
+							}
+							if (data[0]['usuIdEmpresa']==1){$('#logos_empresa').attr("src",'images/feria.png');}
+							else if(data[0]['usuIdEmpresa']==2){$('#logos_empresa').attr("src",'images/farmacia.png');}
+							else if(data[0]['usuIdEmpresa']==3){$('#logos_empresa').attr("src",'images/consultorio.png');}
+						}	
+					}); <!-- fin de registro ajax success -->
+					} <!-- Fin de if , de validacion caso else-->
+					mostrarresultado();
+					borrarresultado();
+					
+
+					} <!-- fin de registro data1 success -->
+				}); <!-- Fin de if , primer ajax -->
+				
+				//borrarresultado();
+				} <!-- Fin de if , de contador-->
+				
+            } <!-- Fin de if , de enter-->
+			} <!-- Fin de if , de keydown-->
+			); <!-- Fin de if , de keydown-->
+$('body').click(function (){
+    $('#txtCodigo').focus();
+})
+
+</script>
+<div class="contenedortodo">
+<div class="cuadro_inicio"></br>
+	<h3>Bienvenido, pase su código de registro:</h3></br>
+	<input name="codigo" id="txtCodigo"  type="password" value="" autocomplete="off" maxlength="8" placeholder="Pase su código, por favor">
+	<label id="lblTiempo">Tiempo</label>
+</div>
+<div class="cuadro_resultado"></br><div id="tablatodo">
+<table >
+	<tr>
+	  <td id="tablalogo"><img id="logos_empresa" src="images/question.png"/></td>
+	  <td id="tabladatos"><p><strong>Vuelve a intentarlo</strong></p></td>
+	  <td id="tablaestado"><img id="logos_estado" src="images/question.png"/></td>
+	</tr>
+	<tr>
+	<td id="tablaresultados" colspan="3">
+	<strong><p>Turno:</strong><span style="padding: 0 10px">&nbsp;</span><span id="turno">--</span></p>
+	<strong><p>Hora de registro:</strong><span style="padding: 0 10px">&nbsp;</span><span id="hora">--</span></p>
+	<strong><p>Minutos de tardanza:</strong><span style="padding: 0 10px">&nbsp;</span><span id="minutotarde">Ninguno</span></p>
+	</td>
+	<tr>
+</table></div>
+ 
+</div></div>
+</body>
+</html>

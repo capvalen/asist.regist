@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.min.js"></script>
+<meta charset=utf-8 />
+<title>Key</title>
+</head>
+<style type="text/css">
+.a, .s, .d, .enter{
+    padding: 50px;
+    display: block;
+    float: left;
+    margin-right: 30px;
+    background: gray;
+    color: white;
+}
+</style>
+<body onload="limpiar()">
+    <div class="a">A</div>
+    <div class="s">S</div>
+    <div class="d">D</div>
+	<div class="enter">Enter</div>
+    <script type="text/javascript" charset="utf-8">
+		function limpiar(){
+			document.getElementById("txtCodigo").value="";
+			document.getElementById("contador").value=0;
+			document.getElementById("txtCodigo").focus();
+		}
+        $(document).keydown(function(tecla){
+            if (tecla.keyCode == 13) {
+                $('.enter').css({ 'background-color' : 'red' });
+				<!-- acepta el enter y deberia empezar a analizar si existe el CodBarras con php -->
+				$contador= document.getElementById("txtCodigo").value.length;
+				document.getElementById("contador").value=$contador;
+				document.getElementById("miForm").submit();
+            }
+			}<!-- Fin de if , deberia alertar del estado de ingreso y limpiar-->
+			);
+    </script>
+	</br>
+	<form id="miForm" action="demo.php" method="post">
+		<input  name="codigo" id="txtCodigo" value="" onKeyUp="cuenta()">
+		<input id="contador" >
+	</form>
+	
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="js/jquery-2.1.1.min.js	"></script>
+<meta charset=utf-8 />
+<title>Registro de asistencias - Feria 13 SRL</title>
+</head>
+<body>
+<script type="text/javascript">
+console.log('iniciando...');
+$.ajax({
+	url: "registro.php",
+	dataType: 'json',
+	type: 'post',
+	cache: false,
+	success: function(data){
+		alert(data[0]['regEntrada01']);
+		console.log(data);
+		
+	}	
+});
+</script>
+
+
+	
+</body>
+</html>

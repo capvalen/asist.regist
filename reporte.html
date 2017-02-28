@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link rel="stylesheet" type="text/css" href="icon.css" />	
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <link rel="stylesheet" href="css/animate.min.css">
+      <title>Reporte de Asistencias</title>
+    </head>
+
+    <body>
+    <nav>
+    	<div class="nav-wrapper blue darken-1">
+    		<a href="#!" class="brand-logo left"><i class="material-icons left">perm_contact_calendar</i>Control Panel</a>
+    		<ul id="nav-mobile" class="right hide-on-med-and-down">
+    			<li class="active"><a href="#"><i class="material-icons left">subtitles</i>Reporte</a></li>
+    			<li><a href="nuevoempleado.html"><i class="material-icons left">recent_actors</i>Nuevo usuario</a></li>
+    			<li><a class="modal-trigger" href="#modal1"><i class="material-icons left">location_on</i>Información</a></li>
+    			<li><a href="https://www.google.com.pe"><i class="material-icons left">power_settings_new</i>Salir</a></li>
+    			<li><div class="nav-wrapper">
+      <form action="#">
+        <div class="input-field">
+          <input id="buscarEmpleado" type="text" required>
+          <label for="text"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div></li>
+    		</ul>
+
+    	</div>
+    </nav>
+    <div class="container">
+    	<div><h4 class="center-align">Reporte de asistencias</h4></div>
+	    <br>
+	    
+	    <div class="row grey lighten-5 z-depth-1">
+	    <div class="row"><div class="col m6 push-m3">
+	    Seleccione los datos y luego pulse el botón de filtrar:</div></div>
+	      
+	        <div class="input-field col s12 m4 blue-text text-darken-2">
+			    <select class="icons" id="cmbEmpresa">
+			      <option value="0" disabled selected>Elige una empresa</option>
+			      <option value="1" data-icon="images/feria.png" class="left circle">Feria 13</option>
+			      <option value="2" data-icon="images/farmacia.png" class="left circle">Farmacia Virgen María</option>
+			      <option value="3" data-icon="images/consultorio.png" class="left circle">Consultorio ORL</option>
+			    </select>
+			    <label>Listado de empresas</label>
+			  </div>
+	      	
+	        <div class="input-field col s12 m3 blue-text text-darken-2">
+	        	<select id='cmbAno' >
+	        	  <option value="" disabled selected>Seleccione el año</option>
+				  <option value="2017">2017</option>
+				  <option value="2016">2016</option>
+				  <option value="2015">2015</option>
+				  <option value="2014">2014</option>
+				</select>
+				<label>Año para filtrar</label>
+			</div>
+
+			<div class="input-field col s12 m3 blue-text text-darken-2">
+	        	<select id='cmbMes' >
+	        	  <option value="" disabled selected>Seleccione el mes</option>
+				  <option value="1">Enero</option>
+				  <option value="2">Febrero</option>
+				  <option value="3">Marzo</option>
+				  <option value="4">Abril</option>
+				  <option value="5">Mayo</option>
+				  <option value="6">Junio</option>
+				  <option value="7">Julio</option>
+				  <option value="8">Agosto</option>
+				  <option value="9">Septiembre</option>
+				  <option value="10">Octubre</option>
+				  <option value="11">Noviembre</option>
+				  <option value="12" >Diciembre</option>
+				</select>
+				<label>Mes para filtrar</label>
+			</div>
+			<a class="btn-floating btn-large waves-effect waves-light red" id="botonFiltrar"><i class="material-icons">search</i></a>
+      	</div>
+	      <div class="divider"></div></br>  <!-- Fin de cuadro de búsqueda -->
+
+	      
+		  
+
+	 <ul class="collapsible" id="acorde" data-collapsible="accordion">
+	 </ul>
+	
+	<div id="modal1" class="modal">
+    <div class="modal-content #fff8e1 ">
+      <h5>Autor: </h5><h6>Carlos Alex Pariona</h6>
+      <h5>Desarrollador de: </h5><h6>Web, Aplicaciones de escritorio y Bases de datos</h6>
+      <h5>Contacto a:</h5> <h6>infocat2.0@gmail.com</h6><br>
+      <p>©2016 Bajo derechos de autor <br>
+      Esta página fue modificada por última vez el 4 mayo del 2016.</p>
+      <img src="images/trio.png" alt="">
+    </div>
+    <div class="modal-footer amber lighten-5">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-gray btn-flat">Aceptar</a>
+    </div>
+  </div>
+
+	<div id="modal3" class="modal bottom-sheet">
+          <div class="modal-content">
+            <h4>Coincidencias</h4>
+            <ul class="collection rellenarCoincidencias">
+              
+            </ul>
+          </div>
+        </div>
+    </div><!-- Fin de container -->
+
+	   
+   
+
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+      <script type="text/javascript" src="js/materialize.min.js"></script>
+	<script>      	
+	  $(document).ready(function() {
+		    $('select').material_select();
+		    $('.preloader-wrapper').show();
+		  	$('.collapsible').hide();
+		    $('.collapsible').collapsible({
+	      	accordion : false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+	    	});
+	    	$('.modal-trigger').leanModal();
+		    console.log('listo');
+	  	});
+
+	  $('#botonFiltrar').click(function(){
+		$('.preloader-wrapper').hide();
+		$('.collapsible').show('slow');
+		var valorEmpresa = $("#cmbEmpresa").val();
+		var valorMes = $("#cmbMes").val();
+		var valorAno = $("#cmbAno").val();
+    	//console.log(valorAno);
+    	if (valorAno === null ||valorAno === undefined || valorEmpresa === null ||valorEmpresa === undefined || valorMes === null ||valorMes === undefined){console.log("falta algo");
+    	$('#botonFiltrar').addClass('animated shake').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){ $(this).removeClass('animated shake')});;}
+    	else{console.log("todo rellenado");	llamar();}
+//	   obtenerDiaSemanaDeFecha('03/05/2016');
+
+	/*var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+	var diasSemana = new Array("Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado");
+	var f = new Date('05/03/2016'); //Formato a seguir mm/dd/yyyy
+	//console.log( "Hoy " + diasSemana[f.getDay()] + ", " + f.getDate() + " de " + meses[f.getMonth()] + " de " + f.getFullYear());
+	console.log( diasSemana[f.getDay()] + " " + f.getDate() + " de " + meses[f.getMonth()]);*/
+		
+		 });
+
+
+	function llamar(){
+    // Así accedemos al Valor de la opción seleccionada
+    
+    var valorEmpresa = $("#cmbEmpresa").val();
+    var valorMes = $("#cmbMes").val();
+    var valorAno = $("#cmbAno").val();
+
+	$('#acorde').load("reporte2016.php?mes="+valorMes+"&ano="+valorAno+"&empresa="+valorEmpresa);
+	}
+	
+	// Así accedemos al Valor de la opción seleccionada
+	//Funciona llamando a los LI que se llamaron de php
+	$("body").on("click", ".liempleado", function(e){
+    e.preventDefault();
+    console.log("el id del empleado es: " +this.id);
+
+    var valorEmpresa = $("#cmbEmpresa").val();
+    var valorMes = $("#cmbMes").val();
+    var valorAno = $("#cmbAno").val();
+    $('#tablita'+this.id).load("detalles2016.php?mes="+valorMes+"&ano="+valorAno+"&empresa="+valorEmpresa+"&id="+this.id);
+	});
+		
+	$("body").on("click", ".botin", function(e){
+    e.preventDefault();
+    console.log("botin es: " +this.id);
+//     $(this).css({"backgroundColor" : "blue"});
+	imprSelec(this.id);
+    });
+
+
+    $('#buscarEmpleado').keypress(function(e) {    	
+    	if(e.which == 13) {
+    		$('.rellenarCoincidencias').load('buscarEmpleado.php?campo='+$('#buscarEmpleado').val())
+    		$('#modal3').openModal();}
+    });
+
+    
+    </script>
+
+	<script type="text/javascript">
+	function imprSelec(muestra)
+	{var ficha=document.getElementById(muestra);var ventimp=window.open(' ','popimpr');ventimp.document.write(ficha.innerHTML);ventimp.document.close();ventimp.print();ventimp.close();}
+	</script>
+
+    </body>
+  </html>

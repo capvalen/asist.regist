@@ -1,0 +1,49 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarEmpleado`(IN `campo` VARCHAR(20))
+    NO SQL
+SELECT concat(usu.usuNombre,' ',usu.usuApellido) as nombre, usuCodigoBarras, usuIdEmpresa
+FROM `usuarios` usu inner join empresa empr
+on usu.usuIdEmpresa = empr.IdEmpresa
+WHERE `usuNombre` LIKE concat(campo,'%') or
+`usuApellido` LIKE concat(campo,'%') or
+usuCodigoBarras like campo
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `empleados_pormes`(IN `ano` INT, IN `mes` INT, IN `empresa` INT)
+    NO SQL
+select DISTINCT usu.idusuario, concat(usu.usuNombre,' ', usuApellido) as Nombre from usuarios usu inner join registro_asistencias reg on usu.idUsuario=reg.IdUsuario where month(reg.regFecha)=mes and year(reg.regFecha)=ano and usuIdEmpresa =empresa order by usunombre
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `registro_detallepormes`(IN `ano` INT, IN `mes` INT, IN `empresa` INT, IN `id` INT)
+    NO SQL
+SELECT concat(usu.usuNombre,' ', usu.usuApellido) As Nombre, cast(Date_format(reg.regFecha,'%d') as UNSIGNED) as Dia
+, case reg.regEntrada01 when '00:00:00' then '' else reg.regEntrada01 end as Entrada01, case reg.regsalida01 when '00:00:00' then '' else reg.regsalida01 end as Salida01, case reg.regEntrada02 when '00:00:00' then '' else reg.regEntrada02 end as Entrada02, case reg.regsalida02 when '00:00:00' then '' else reg.regsalida02 end as Salida02, case when reg.regTardanzaDia < 0 then @min1:=0 when reg.regTardanzaDia="00:00:00" then @min1:=0 else @min1:=TIME_TO_SEC(reg.regTardanzaDia) end as TardanzaDia, case when reg.regTardanzaTarde < 0 then @min2:=0 when reg.regTardanzaTarde="00:00:00" then @min2:=0 else @min2:=TIME_TO_SEC(reg.regTardanzaTarde) end as TardanzaTarde, @min1 + @min2 as Parcial, SUBSTRING(SEC_TO_TIME(@min1 + @min2),1,8) as Suma from usuarios usu inner join registro_asistencias reg on usu.idUsuario=reg.IdUsuario where month(reg.regFecha)=mes and year(reg.regFecha)=ano and usuIdEmpresa =empresa and reg.idUsuario=id order by regFecha
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reporte`(IN `mesFecha` INT, IN `anoFecha` INT)
+    NO SQL
+SELECT concat(usu.usuNombre,' ', usu.usuApellido) As Nombre, reg.regFecha,
+case reg.regEntrada01 when '00:00:00' then '' else reg.regEntrada01 end as Entrada01,
+case reg.regsalida01 when '00:00:00' then '' else reg.regsalida01 end as Salida01,
+case reg.regEntrada02 when '00:00:00' then '' else reg.regEntrada02 end as Entrada02,
+case reg.regsalida02 when '00:00:00' then '' else reg.regsalida02 end as Salida02,
+case when reg.regTardanzaDia < 0 then @min1:=0 when reg.regTardanzaDia="00:00:00" then @min1:=0 else @min1:=TIME_TO_SEC(reg.regTardanzaDia) end as TardanzaDia,
+case when reg.regTardanzaTarde < 0 then @min2:=0 when reg.regTardanzaTarde="00:00:00" then @min2:=0 else @min2:=TIME_TO_SEC(reg.regTardanzaTarde) end as TardanzaTarde,
+SEC_TO_TIME(@min1 + @min2) as Suma
+FROM registro_asistencias reg inner join usuarios usu
+on usu.idUsuario=reg.IdUsuario
+where usu.usuEstadoActivo=1 and month(reg.regFecha)= mesFecha and year(reg.regFecha)=anoFecha
+order by reg.regFecha, Nombre
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertar_NuevoEmpleado`(IN `nombre` VARCHAR(50), IN `apellido` VARCHAR(50), IN `codigo` VARCHAR(8), IN `idempresa` INT)
+begin
+INSERT INTO `asistenciasferia13`.`usuarios` (`usuNombre`, `usuApellido`, `usuCodigoBarras`, `usuIdEmpresa` )
+VALUES (nombre, apellido, codigo, idempresa);
+SELECT idUsuario from usuarios where usuCodigoBarras=codigo;
+end

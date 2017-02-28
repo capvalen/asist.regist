@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+	<link rel="stylesheet" href="css/reporte.css">
+	<title>Reporte de asistencias - Feria 13 SRL</title>
+
+	<script>
+
+	function cargar(){
+		var fecha = new Date ();
+		//alert(fecha.getMonth ()); el mes lo entrega con mes-1
+		document.getElementById("cmbMes").selectedIndex=fecha.getMonth ();
+		/*$("#myDetalle").hide('fast');
+		$("#myDIV").hide('fast');*/
+	}
+
+	function llamadorespuesta(ooId){
+
+		//alert('clic en el elemento de Id: '+ooId);
+		//alert('clic en el contenido: '+ $("#"+ooId).text());
+		var valorEmpresa = $("#cmbEmpresa").val();
+	    var valorMes = $("#cmbMes").val();
+	    var valorAno = $("#cmbAno").val();
+	    //alert($("#cmbAno option:selected").text());
+	    var parcial=0
+
+	    $.ajax({
+	    	url: 'detalles.php',
+	    	dataType: 'json',
+	    	type: 'post',
+	    	cache: false,
+	    	data:{mes: valorMes,
+				ano: valorAno,
+				empresa: valorEmpresa,
+				id: ooId},
+			success: function (dataDetalle){
+			console.log('Iniciando detalle...');
+			console.log(dataDetalle);
+			
+			var totalDiasMes=ultimoDiaMes(parseInt(valorMes)+1 ,valorAno);
+			totaFilas=parseInt(dataDetalle.length);
+			j=0; 
+			for (i =1 ; i<=totalDiasMes; i++){
+				console.log(i);
+				if(j<totaFilas){ if(i==dataDetalle[j]['Dia']){
+					var row=$('<tr />');
+					$('<td />').text(dataDetalle[j].Dia).appendTo(row);
+					$('<td />').text(dataDetalle[j].Entrada01).appendTo(row);
+					$('<td />').text(dataDetalle[j].Salida01).appendTo(row);
+					$('<td />').text(dataDetalle[j].Entrada02).appendTo(row);
+					$('<td />').text(dataDetalle[j].Salida02).appendTo(row);
+					parcial+=parseInt(dataDetalle[j].Parcial);
+					$("#pMinutos").text(Math.round(parcial/60) + ' minutos aprox.');
+					console.log('parcial de parcial es: '+ parcial);
+					$('<td />').text(dataDetalle[j].Suma).appendTo(row);
+					row.appendTo('table');
+					j++;} //Fin de if 
+				else{
+					var row=$('<tr />');
+					$('<td />').text(i).appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					row.appendTo('table');
+					}
+				}else{
+					var row=$('<tr />');
+					$('<td />').text(i).appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					$('<td />').text('').appendTo(row);
+					row.appendTo('table');
+					}
+			} //Fin de for
+			}//Fin de success
+			
+	    });	
+		//$("#pMinutos").text();
+
+	    $("#pNombre").text($("#"+ooId).text());
+	    $("#pMes").text($("#cmbMes option:selected").text());
+		$("#myDIV").hide('slow');
+		$(".listaResultado").css('visibility','hidden');
+		$("#myDetalle").css('visibility','visible');
+		$("#myDetalle").show('slow');
+	}
+
+	function regresar(){
+		$(".listaResultado").css('visibility','visible');
+		$("#myDIV").show('slow');
+		$("#myDetalle").hide('slow');
+		$("#myDetalle").css('visibility','hidden');
+		$("#tablita").find("tr:gt(0)").remove();
+	}
+
+	function actualizar(){
+		// var fechaHoy = new Date();
+		// console.log(fechaHoy.toString());
+		// var fecha187 = new Date(fechaHoy);
+		// fecha187.setDate(-3);
+		// console.log(fecha187.toString());
+		
+	}
+
+	function ultimoDiaMes(mes, ano){
+		//mes,dia,año
+		//var d = new Date(mes+'/01/'+ano);
+		var d=new Date(ano,01,mes);
+		//console.log(d);
+	    d.setDate(0);
+	    //document.getElementById("demo").innerHTML = d.getDate();
+		//document.getElementById("demo2").innerHTML = d;
+		console.log('Total de días del mes: '+ d.getDate());
+		//console.log(d);
+		return d.getDate();
+	}
+
+	function limpiar(){
+		$("#myDIV").empty();
+		$("#myDetalle").hide();
+		$("#tablita").find("tr:gt(0)").remove();
+	}
+
+	function llamar(){
+    // Así accedemos al Valor de la opción seleccionada
+    limpiar();
+    var valorEmpresa = $("#cmbEmpresa").val();
+    var valorMes = $("#cmbMes").val();
+    var valorAno = $("#cmbAno").val();
+    //alert('empresa: ' +valorEmpresa+' mes: '+valorMes +' año: '+ valorAno);
+
+    
+
+    $.ajax({
+		url: "reporte.php",
+		dataType: 'json',
+		type: 'post',
+		cache: false,
+		data: {mes: valorMes,
+				ano: valorAno,
+				empresa: valorEmpresa
+		},
+		success: function(data){
+			//alert(data[0]['regEntrada01']);
+			console.log('Iniciando...');
+			console.log(data);
+			console.log('Data recibida...');
+			//console.log(data[0][0]);
+			var parrafo=document.createElement('p');
+			parrafo.textContent="Listado de empleados registrados en éste mes:";
+			document.getElementById("myDIV").appendChild(parrafo);
+
+			for(var i in data){
+				//********* Forma 01 para agregar los resultados en una etiqueta p
+				// var para = document.createElement("p"); // Create a <p> node
+				// var t = document.createTextNode(data[i][1]); // Create a text node
+				// para.appendChild(t); // Append the text to <p>
+				// para.id=data[i][0];
+				// document.getElementById("myDIV").appendChild(para);
+
+				var contenedor=document.createElement('div');
+				contenedor.textContent = parseInt(i)+1 +'. '+ data[i][1];
+				contenedor.className = 'resultado';
+				contenedor.id=data[i][0];
+				contenedor.setAttribute('onclick', 'llamadorespuesta("'+data[i][0]+'");');
+				document.getElementById("myDIV").appendChild(contenedor);
+			}
+		}	
+	});
+
+	}
+</script>
+</head>
+
+<body onload="cargar()">
+<div class="cuerpo">
+	<div class="datos">
+		<select class="styled-select blue semi-square" id="cmbEmpresa">
+			<option value="1">Feria 13</option>
+			<option value="2">Farmacia</option>
+			<option value="3">Consultorio</option>
+		</select>
+
+		 <select class="styled-select blue semi-square" id='cmbMes' >
+		  <option value="1">Enero</option>
+		  <option value="2">Febrero</option>
+		  <option value="3">Marzo</option>
+		  <option value="4">Abril</option>
+		  <option value="5">Mayo</option>
+		  <option value="6">Junio</option>
+		  <option value="7">Julio</option>
+		  <option value="8">Agosto</option>
+		  <option value="9">Septiembre</option>
+		  <option value="10">Octubre</option>
+		  <option value="11">Noviembre</option>
+		  <option value="12" >Diciembre</option>
+		 </select> 
+
+		 <select class="styled-select blue semi-square" id='cmbAno' >
+		 <option value="2016" selected="selected">2016</option>
+		  <option value="2015">2015</option>
+		  <option value="2014">2014</option>  
+		 </select> 
+
+		 <button class="btnFiltrar lupa" onclick="llamar(); regresar();">Filtrar</button>
+	 </div>
+	<div class="listaResultado">
+		<div id="myDIV">
+			<!-- Contiene la lista de resultados con nombres de empleados -->
+		</div>
+	</div>
+	<div id="myDetalle">
+		<div id="datosDetalle">
+			<div>Nombre: <span id="pNombre">(Nombre)</span></div>
+			<div>Mes: <span id="pMes">(mes)</span></div>
+			<div>Total tardanza: <span id="pMinutos">(total)</span></div>
+			<button class="btnAceptar" onclick="regresar()">Aceptar</button>
+		</div>
+
+		 <table border="1" style="width:100%" id="tablita">
+		  <tr>
+		    <th>Día</th>
+		    <th>Entrada 01</th>
+		    <th>Salida 01</th>
+		    <th>Entrada 02</th>
+		    <th>Salida 02</th>
+		    <th>Tardanza</th>
+		  </tr>
+		</table> 
+			
+			<!--<button class="btnActu" onclick="actualizar()">Update</button>!-->
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYE html>
+<html>
+<head>
+<title>Primera prueba html5</title>	
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+</head>
+
+<body>
+<p>Escribe un nombre: </p>
+<input type="text" onkeyup="mostrarSugerencia(this.value)">
+<p>Las sugerencias: <span id="txtSugerencias"></span></p>
+
+<script type="text/javascript">
+//JAVASCRIPT
+function mostrarSugerencia(nombre)
+{
+	//jQuery
+	$.ajax({
+		
+		url: 'http://localhost/AsistPruebas/ajax/registro.php',
+		type: 'json',
+		}).done(
+		function (respuesta)
+			{
+			
+			$.post('http://localhost/AsistPruebas/ajax/registro.php', '', callback,'json');
+			}
+	);
+	function callback(data) {
+	var codigo = data.cod;
+	var nombre = data.nom;
+	var direccion = data.dir;
+
+}
+</script>
+
+</body>
+</html>

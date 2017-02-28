@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Registro de nuevo usuario</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<script src="js/jquery-2.1.4.min.js"></script>
+	<link href="css/signin.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+<div class="container">
+
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Registro de nuevo empleado</h2>
+        <label for="inputNombre" class="sr-only">Nombre:</label>
+        <input type="text" style="text-transform:uppercase;" id="inputNombre" class="form-control" placeholder="Nombre" required autofocus>
+        <label for="inputApellido" class="sr-only">Apellido</label>
+        <input type="text" style="text-transform:uppercase;" id="inputApellido" class="form-control" placeholder="Apellido" required>
+		<label for="inputCodigo" class="sr-only">Codigo</label>
+        <input type="text" id="inputCodigo" data-toggle="popover" data-trigger="focus" class="form-control" placeholder="Código"  data-placement="left" data-content="Ya existe el código" required readonly>
+        
+        <div class="mitooltip btn-group" data-toggle="popover" data-trigger="click" >		
+	  <button type="button" class="btn btn-default dropdown-toggle" id="btnEmpresa" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Seleccione empresa <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu" >
+		<li><a href="#" id="feria">Feria 13 </a></li>
+		<li><a href="#" id="consultorio">Consultorio ORL </a></li>
+		<li><a href="#" id="farmacia">Farmacia Santa María </a></li>		
+	  </ul>
+		</div><button type="button" id="refrescarCodigo" data-toggle="popover" class="btn btn-default"  aria-label="Help" data-placement="right" data-content="Primero elija una empresa"><span class="glyphicon glyphicon-refresh"></span></button><br><br>
+    <button class="btn btn-lg btn-primary btn-block" id="btnRegistrar">Registrar</button>
+    <button class="btn btn-lg btn-warning btn-block" type="reset" id="btnBorrar">Borrar</button>
+      </form>
+
+    </div> <!-- /container -->
+    <div class="container mostrarResultado">
+      <h3>Nuevo empleado registrado:</h3><br>
+      <strong>Nombres:</strong> <span id="mostrarNombre"></span><br>
+      <strong>Código Barras:</strong> <span id="mostrarCodigo"></span><br>
+      <strong>Empresa: </strong><span id="mostrarEmpresa"></span><br>
+      </div>
+	<script>
+	$idEmpresa=0;
+  $nombreEmpresa='';
+
+  $('.mostrarResultado').hide();
+
+  function guardarNuevoEmpleado(){
+    if ($('#inputNombre').val()!="" && $('#inputApellido').val()!="" && $('#inputCodigo').val()!="" && $idEmpresa!=0){
+      
+        $.ajax({
+        url: "registro_nuevopersonal.php",
+        type: 'post',
+        cache: false,
+        data: {nombre: $('#inputNombre').val().toUpperCase() ,
+          apellido: $('#inputApellido').val().toUpperCase() ,
+          codigoBarra: $('#inputCodigo').val(),
+          empresa: $idEmpresa
+        },
+        success: function(data){
+          $('.mostrarResultado').show('slow');
+          $('#mostrarNombre').text($('#inputApellido').val().toUpperCase() +' ' + $('#inputNombre').val().toUpperCase());
+          $('#mostrarCodigo').text($('#inputCodigo').val());
+          $('#mostrarEmpresa').text( $nombreEmpresa);
+         console.log(data);
+
+         $('#btnBorrar').click();
+        } 
+        });
+    }
+  }
+
+  function nuevoCodigo(){
+    if($idEmpresa==0){
+      $('#refrescarCodigo').popover('show');}
+    else {$('#refrescarCodigo').popover('hide');
+    if($idEmpresa==1){$aleatorio=Math.round(Math.random() * (99999999 - 65401234) + 65401234);}
+    else {$aleatorio=Math.round(Math.random() * (99999 - 65401) + 65401);}
+    
+    $('#inputCodigo').val($aleatorio); 
+    $.ajax({
+    url: "comprobar_CodigoBarras.php",
+    type: 'post',
+    cache: false,
+    data: {codigo: $aleatorio},
+    success: function(data){
+      if(parseInt(data)==1){//console.log('existe');
+      $('#inputCodigo').popover('show');}
+      else{$('#inputCodigo').popover('hide');}
+    } //Fin de success
+    });
+    }
+  
+  }
+    
+
+	$('#feria').click(function (){ $('#btnEmpresa').html("Feria 13 "+'<span class="caret">');$idEmpresa=1; $('#inputCodigo').val(''); $nombreEmpresa="Feria 13 SRL";});	
+	$('#farmacia').click(function (){ $('#btnEmpresa').html("Farmacia Santa María "+'<span class="caret">');$idEmpresa=2; $('#inputCodigo').val(''); $nombreEmpresa="Farmacia Santa María";});
+	$('#consultorio').click(function (){ $('#btnEmpresa').html("Consultorio OCR "+'<span class="caret">');$idEmpresa=3; $('#inputCodigo').val(''); $nombreEmpresa="Consultorio ORL";});
+  $('#btnBorrar').click(function (){ $('#btnEmpresa').html("Seleccione empresa "+'<span class="caret">');$idEmpresa=0;});
+  $('#refrescarCodigo').click(function (){nuevoCodigo();
+   });
+	$('#btnRegistrar').click(function (){
+	//console.log($idEmpresa);
+  if($idEmpresa==0){//console.log('empres vacia');
+     $('.mitooltip').popover({
+        content: 'Seleccione una empresa',
+        placement: 'left'});
+     $('.mitooltip').popover('show');}
+  else{guardarNuevoEmpleado();}
+	});
+
+
+	</script>
+	
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="js/bootstrap.min.js"></script>
+	<script src="js/ie10-viewport-bug-workaround.js"></script>
+  <!--<script>$('.mitooltip').tooltip();</script>-->
+  </body>
+</html>

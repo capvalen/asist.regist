@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="js/jquery-2.1.1.min.js"></script>
+<meta charset=utf-8 />
+<title>Registro de asistencias - Feria 13 SRL</title>
+</head>
+<body onload="limpiar()">
+<script type="text/javascript" charset="utf-8">
+		function limpiar(){
+			document.getElementById("txtCodigo").value="";
+			document.getElementById("txtCodigo").focus();
+		}
+        $(document).keydown(function(tecla){
+            if (tecla.keyCode == 13) {
+				<!-- acepta el enter y deberia empezar a analizar si existe el CodBarras con php -->
+				$contador= document.getElementById("txtCodigo").value.length;
+				if($contador>3){
+				console.log('iniciando...');
+				$.ajax({
+					url: "registro.php",
+					dataType: 'json',
+					type: 'post',
+					cache: false,
+					success: function(data){
+						console.log(data);
+					}	
+				});
+				}<!-- Fin de if de contador-->
+				
+            }
+			}<!-- Fin de if , deberia alertar del estado de ingreso y limpiar-->
+			);
+
+</script>
+<form id="miForm" action="registro.php" method="post">
+	<input name="codigo" id="txtCodigo" value="" autocomplete="off" maxlength="8">
+	<input id="contador" >
+</form>
+	
+</body>
+</html>
