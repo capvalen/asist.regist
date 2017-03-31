@@ -1,3 +1,10 @@
+DROP PROCEDURE `insertar_NuevoEmpleado`; CREATE DEFINER=`root`@`localhost` PROCEDURE `insertar_NuevoEmpleado`(IN `nombre` VARCHAR(50), IN `apellido` VARCHAR(50), IN `codigo` VARCHAR(8), IN `idempresa` VARCHAR(1)) NOT DETERMINISTIC NO SQL SQL SECURITY DEFINER begin INSERT INTO `usuarios` (`usuNombre`, `usuApellido`, `usuCodigoBarras`, `usuIdEmpresa`, `usuFoto` ) VALUES (nombre, apellido, codigo, idempresa, 'ok.png'); SELECT `usuCodigoBarras` FROM `usuarios`; end 
+
+
+
+
+
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarEmpleado`(IN `campo` VARCHAR(20))
     NO SQL
 SELECT concat(usu.usuNombre,' ',usu.usuApellido) as nombre, usuCodigoBarras, usuIdEmpresa
