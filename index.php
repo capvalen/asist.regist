@@ -64,19 +64,19 @@ small{font-size: 74%;}
       <div class="col-sm-5 p-0 contDerecha shadow">
          <div class="divCabeza">
             <div class="div1">
-               <p class="p-2 mb-0"> <i class="icofont-clock-time"></i> <span id="spanFecha"></span></p>
+               <p class="p-3 mb-0"> <i class="icofont-clock-time"></i> <span id="spanFecha"></span></p>
             </div>
             <div class="div2"> <img src="images/path4584.png" class="img-fluid" alt=""></div>
             <div class="d-flex justify-content-center mt-n5 ">
-                  <img src="images/noimg.jpg?v1" alt="" class="rounded-circle" class="img-fluid "  >
+                  <img src="images/infocat.png?v1.1" alt="" class="rounded-circle" >
             </div>
-            <h5 class="text-center">Luna Romir</h5>
+            <h5 class="text-center d-none">Luna Romir</h5>
             <div id="separador2"><img src="images/separador2.png?v=3" class="img-fluid" alt=""></div>
          </div>
          <div class="divCuerpo py-2 text-center">
-            <h2 class="display-2 " id="icono"><i class="icofont-check-circled"></i></h2>
-           <h5 class="text-muted">Dato guardado </h5>
-           <h5 class="text-muted">6:00 p.m.</h5>
+            <h2 class="display-2 mt-n2 d-none" id="icono"><i class="icofont-check-circled"></i></h2>
+           <h5 class="text-muted d-none" id="h5Resultado"></h5>
+           <h5 class="text-muted d-none">6:00 p.m.</h5>
          </div>
          
          
@@ -90,9 +90,11 @@ small{font-size: 74%;}
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="js/moment.js"></script>
 <script>
-$('#spanFecha').text(moment().format('L d/mm/YYYY - h:mm a'));
+moment.locale('es');
+$('#spanFecha').text(moment().format('dddd D/MM/YYYY - h:mm a'));
+$("#txtDni").attr('maxlength','12');
 setInterval( function(){
-   $('#spanFecha').text(moment().format('L d/mm/YYYY - h:mm a'));
+   $('#spanFecha').text(moment().format('dddd D/MM/YYYY - h:mm a'));
 }, 3000);
 $(document).ready(function() {
    moment.locale('es');
@@ -101,7 +103,38 @@ $(document).ready(function() {
 function mifuncion(){ console.log('d')
    //
 }
-
+$('#txtDni').keyup(function(e) {
+	if($('#txtDni').val().length == 12){ console.log( 'aca' );
+		e.preventDefault();  
+      e.returnValue = false;
+      e.cancelBubble = true;
+      return false;
+		
+	}else{
+		if( $('#txtDni').val().length>=8){
+			console.log( 5 );
+		}
+	}
+   
+});
+$('#btnRegistrar').click(function() {
+   $.ajax({url: 'php/insertarAsistencia.php', type: 'POST', data: {codigo: $('#txtDni').val() }}).done(function(resp) {
+      console.log(resp)
+      switch ($.trim(resp)) {
+         case 'Revise su DNI':
+            $('#h5Resultado').html('<span class="text-danger">'+resp+'</span>').removeClass('d-none');
+            break;
+         case 'Horario actualizado':
+         case 'Ya registraste tu horario':
+         case 'Horario registrado':
+            $('#icono').removeClass('d-none');
+            $('#h5Resultado').html(resp).removeClass('d-none');
+            break;
+         default:
+            break;
+      }
+   });
+});
 </script>
 </body>
 </html>
