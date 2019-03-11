@@ -29,10 +29,13 @@ background-color: #fff;}
    max-width: 40rem;
 }
 .bg-dark {
-    background-color: #a549ce!important;
+    background-color: #8b3ac1!important;
 }
 .text-muted {
     color: #dadada!important;
+}
+button:focus{
+	outline: 5px auto #eee;
 }
 </style>
   <div class="collapse bg-dark" id="navbarHeader">
@@ -56,11 +59,19 @@ background-color: #fff;}
     </div>
   </div>
   <div class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container d-flex justify-content-between">
-      <a href="#" class="navbar-brand d-flex align-items-center">
-       <i class="icofont-server"></i> <strong class="pl-3">Control de asitencias</strong>
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="container d-flex">
+      <div class="flex-grow-1">
+				<a href="#" class="navbar-brand d-flex align-items-center">
+					<i class="icofont-server"></i> <strong class="pl-3">Control de asitencias</strong>
+				</a>
+			</div>
+			<button class="navbar-toggler ml-2" type="button" id="btnListarPersonal" >
+        <span><i class="icofont-list"></i></span>
+			</button>
+      <button class="navbar-toggler ml-2" type="button" id="btnNuevoPersonal" >
+        <span><i class="icofont-contact-add"></i></span>
+			</button>
+			<button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
         <span><i class="icofont-toy-cat"></i></span>
       </button>
     </div>
@@ -100,9 +111,85 @@ background-color: #fff;}
 
 
 
-   
+<div class="modal" id="modalNuevoPersonal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Agregar personal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+				<p>D.N.I.</p>
+				<input type="text" class="form-control" id="txtDniPers">
+				<p>Nombres</p>
+				<input type="text" class="form-control" id="txtNombrePers">
+				<p>Apellidos</p>
+				<input type="text" class="form-control" id="txtApellidoPers">
+      </div>
+      <div class="modal-footer">
+				<label for="" class="text-danger d-none" id="lblError"><i class="icofont-cat-alt-3"></i> <span></span></label>
+				<label for="" class="text-success d-none" id="lblExito"><i class="icofont-fish-5"></i> <span></span></label>
+        <button type="button" class="btn btn-outline-primary" id="btnGuardarPersona"><i class="icofont-save"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
+<div class="modal" id="modalListadoPersonal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Listado de personal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>N°</th>
+								<th>Apellidos y Nombres</th>
+								<th>DNI</th>
+								<th>@</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php require 'php/listarPersonal.php'; ?>
+						</tbody>
+					</table>
+				</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" id="btnGuardarPersona"><i class="icofont-save"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalBorrarPersonal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Borrar personal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+				<p>¿Está seguro que desea borrar a: <strong id="strNombre"></strong>?</p>
+      </div>
+      <div class="modal-footer">				
+        <button type="button" class="btn btn-outline-dark" data-dismiss="modal" id="btnCancelarBorrar"><i class="icofont-save"></i> Cancelar</button>
+        <button type="button" class="btn btn-outline-danger" id="btnBorrarPersona"><i class="icofont-save"></i> Borrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -138,6 +225,47 @@ $('#btnFiltrarReporte').click(function() {
 	});
 });
 	}
+});
+$('#btnListarPersonal').click(function() {
+	$('#modalListadoPersonal').modal('show');
+});
+$('#btnNuevoPersonal').click(function() {
+	$('#modalNuevoPersonal').modal('show');
+});
+$('#btnGuardarPersona').click(function() {
+	$('#lblExito').addClass('d-none');
+	$('#lblError').addClass('d-none');
+
+	if( $('#txtDniPers').val()=='' || $('#txtNombrePers').val()=='' || $('#txtApellidoPers').val()=='' ){
+		$('#lblError').removeClass('d-none').find('span').text('Debe rellenar todos los campos obligatorio');
+	}else{
+		$('#lblExito').addClass('d-none');
+		$('#lblError').addClass('d-none');
+		$.ajax({url: 'php/crearPersonal.php', type: 'POST', data: {dni: $('#txtDniPers').val(), apellido: $('#txtApellidoPers').val(), nombre: $('#txtNombrePers').val() }}).done(function(resp) {
+			console.log(resp)
+			if($.trim(resp)=='todo ok'){
+				//$('#modalNuevoPersonal').modal('hide');
+				$('#modalNuevoPersonal input').val('');
+				$('#lblExito').removeClass('d-none').find('span').text('Registro guardado con éxito');
+			}else{
+				$('#lblError').removeClass('d-none').find('span').text('Hubo un error interno, comunícalo a soporte informático');
+			}
+		});
+	}
+});
+function removerPersonal(idEmple){
+	$.idEmple = idEmple;
+	var nombre = $(`td[data-id="${idEmple}"]`).text();
+	$('#strNombre').text(nombre);
+	$('#modalListadoPersonal').modal('hide');
+	$('#modalBorrarPersonal').modal('show');
+}
+$('#btnBorrarPersona').click(function() {
+	$.ajax({url: 'php/borrarPersonal.php', type: 'POST', data: { idUser: $.idEmple }}).done(function(resp) {
+		if($.trim(resp)=='todo ok'){
+			location.reload();
+		}
+	});
 });
 </script>
 </body>

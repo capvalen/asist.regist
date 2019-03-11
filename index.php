@@ -113,6 +113,9 @@ small{font-size: 74%;}
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="js/moment.js"></script>
 <script>
+$(document).ready(function () {
+   $('#txtDni').focus();
+})
 $('#txtClave2').attr('type', 'password');
 moment.locale('es');
 $('#spanFecha').text(moment().format('dddd D/MM/YYYY - h:mm a'));
@@ -124,9 +127,9 @@ $(document).ready(function() {
    moment.locale('es');
    
 });
-function mifuncion(){ console.log('d')
-   //
-}
+/* $('body').click(function() {
+   $('#txtDni').focus();
+}); */
 $('#txtDni').keyup(function(e) {
 	var code = e.which; 
 	if($('#txtDni').val().length == 12){ console.log( 'aca' );
@@ -140,6 +143,18 @@ $('#txtDni').keyup(function(e) {
 	}
    if( code==13 ){
 		$('#btnRegistrar').click();
+	}
+});
+$('#txtLogin').keyup(function(e) {
+   var code = e.which; 
+   if( code==13 ){
+		$('#btnLoguearse').click();
+	}
+});
+$('#txtClave2').keyup(function(e) {
+   var code = e.which; 
+   if( code==13 ){
+		$('#btnLoguearse').click();
 	}
 });
 $('#btnRegistrar').click(function() {
