@@ -32,13 +32,13 @@ body{ background-color: #ddbfe3;
    border-radius: 10px;
    background-color: #e7ecf0;
 }
-#txtDni{ 
+#txtDniRegistro{ 
    background-color: transparent;
    border: none; color: #fff;
    border-bottom: 2px solid #ffffff8c;
    border-radius: 0;}
-#txtDni:focus{box-shadow:none;}
-#txtDni::placeholder{color:#9D7BA0}
+#txtDniRegistro:focus{box-shadow:none;}
+#txtDniRegistro::placeholder{color:#9D7BA0}
 #btnRegistrar{color: #543052;}
 small{font-size: 74%;}
 .pPie, .pTiempo{margin-bottom: 0; color: #d0bad2;}
@@ -56,7 +56,7 @@ small{font-size: 74%;}
          <div class=" w-75 mx-auto ">
             <img src="images/logoBlanco.png" alt="" class="img-fluid py-5 px-2">
             <h4 class="text-center py-3">Control de asistencias</h4>
-            <input type="text" class="form-control mx-auto text-center" placeholder="Ingrese su D.N.I." id="txtDni">
+            <input type="text" class="form-control mx-auto text-center" placeholder="Ingrese su D.N.I." id="txtDniRegistro" autocomplete="off">
             <button class="my-5 btn btn-light btn-block rounded-pill" id="btnRegistrar">Registrar</button>
             <p class="pPie text-center pt-5"><small>Desarrollado por: <a href="https://infocatsoluciones.com" style="color: inherit;">Infocat Soluciones S.A.C. ®</a></small></p>
             <p class=' text-center pTiempo'><small>Versión: 1.0 ~ <?= date('Y');?></small> <a href="#!" class="text-reset" id="loginPanel"><i class="icofont-lock"></i></a></p>
@@ -114,12 +114,12 @@ small{font-size: 74%;}
 <script src="js/moment.js"></script>
 <script>
 $(document).ready(function () {
-   $('#txtDni').focus();
+   $('#txtDniRegistro').focus().val();
 })
 $('#txtClave2').attr('type', 'password');
 moment.locale('es');
 $('#spanFecha').text(moment().format('dddd D/MM/YYYY - h:mm a'));
-$("#txtDni").attr('maxlength','12');
+$("#txtDniRegistro").attr('maxlength','12');
 setInterval( function(){
    $('#spanFecha').text(moment().format('dddd D/MM/YYYY - h:mm a'));
 }, 3000);
@@ -128,11 +128,11 @@ $(document).ready(function() {
    
 });
 /* $('body').click(function() {
-   $('#txtDni').focus();
+   $('#txtDniRegistro').focus();
 }); */
-$('#txtDni').keyup(function(e) {
+$('#txtDniRegistro').keyup(function(e) {
 	var code = e.which; 
-	if($('#txtDni').val().length == 12){ console.log( 'aca' );
+	if($('#txtDniRegistro').val().length == 12){ console.log( 'aca' );
 		e.preventDefault();  
       e.returnValue = false;
       e.cancelBubble = true;
@@ -158,8 +158,8 @@ $('#txtClave2').keyup(function(e) {
 	}
 });
 $('#btnRegistrar').click(function() {
-   if( $('#txtDni').val().length>=8){
-   $.ajax({url: 'php/insertarAsistencia.php', type: 'POST', data: {codigo: $('#txtDni').val() }}).done(function(resp) {
+   if( $('#txtDniRegistro').val().length>=8){
+   $.ajax({url: 'php/insertarAsistencia.php', type: 'POST', data: {codigo: $('#txtDniRegistro').val() }}).done(function(resp) {
       console.log(resp)
       switch ($.trim(resp)) {
          case 'Revise su DNI':
@@ -172,7 +172,7 @@ $('#btnRegistrar').click(function() {
             $('#icono').removeClass('d-none');
             $('#h5Resultado').html(resp).removeClass('d-none');
 				setInterval(() => {
-					$('#txtDni').val('');
+					$('#txtDniRegistro').val('');
 					$('#imgPersonal').attr('src', 'images/infocat.png');
 					$('#icono').addClass('d-none');
             	$('#h5Resultado').addClass('d-none');
