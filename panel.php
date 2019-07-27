@@ -167,7 +167,7 @@ button:focus{
 				</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary" id="btnGuardarPersona"><i class="icofont-save"></i> Guardar</button>
+        <button type="button" class="btn btn-outline-default" id="btnGuardarPersona" data-dismiss="modal"><i class="icofont-close"></i> Cerrar</button>
       </div>
     </div>
   </div>
