@@ -175,7 +175,7 @@ $('#btnRegistrar').click(function() {
 				setTimeout(() => {
 					$('#txtDni').val('');
 =======
-				setInterval(() => {
+				setTimeout(() => {
 					$('#txtDniRegistro').val('');
 >>>>>>> ec0f5836fa041bb8588b8460165efe1d7a8a6c2a
 					$('#imgPersonal').attr('src', 'images/infocat.png');
