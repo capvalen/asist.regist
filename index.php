@@ -171,7 +171,7 @@ $('#btnRegistrar').click(function() {
 				$('#imgPersonal').attr('src', 'images/noimg.jpg');
             $('#icono').removeClass('d-none');
             $('#h5Resultado').html(resp).removeClass('d-none');
-				setInterval(() => {
+				setTimeout(() => {
 					$('#txtDni').val('');
 					$('#imgPersonal').attr('src', 'images/infocat.png');
 					$('#icono').addClass('d-none');

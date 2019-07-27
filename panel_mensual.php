@@ -15,6 +15,7 @@ if (!isset($_COOKIE['ckUsuario'])){
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
    <title>Panel de Control de asistencias</title>
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css">
    <link rel="stylesheet" href="css/icofont.css">
 </head>
 <body>
@@ -71,8 +72,8 @@ button:focus{
 			<button class="navbar-toggler ml-2" type="button" id="btnNuevoPersonal" title="Agregar personal" >
 			<span><i class="icofont-contact-add"></i></span>
 			</button>
-			<a class="navbar-toggler ml-2" href="panel_mensual.php" title="Reporte mensual"><i class="icofont-address-book"></i></a>
-			<button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation" title="Créditos">
+			<a href="paneljunto.php" title="Reporte mensual"><i class="icofont-address-book"></i></a>
+			<button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
 				<span><i class="icofont-toy-cat"></i></span>
 			</button>
    	</div>
@@ -82,9 +83,12 @@ button:focus{
 <main>
 <section class="jumbotron text-center">
     <div class="container">
-      <h1 class="jumbotron-heading">Reporte diario</h1>
+      <h1 class="jumbotron-heading">Reporte mensual</h1>
       <div class="form-inline d-flex justify-content-center">
-			<input type="date" class="form-control text-center" id="txtFechaFiltro">
+			<select name="" id="input" class="form-control" required="required" id="sltUsuarios">
+				<?php include 'php/optListarUusuarios.php'; ?>
+			</select>
+			<input type="text" class="form-control text-center" id="txtFechaFiltro">
 			<button class="btn btn-outline-primary ml-3" id="btnFiltrarReporte"><i class="icofont-search-2"></i> Filtrar</button>
 		</div>
     </div>
@@ -197,8 +201,13 @@ button:focus{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="js/moment.js"></script>
+<script src="js/bootstrap-material-datetimepicker.js?version=1.3"></script>
 <script>
-$('#txtFechaFiltro').val('<?= date('Y-m-d');?>');
+//$('txtFechaFiltro').bootstrapMaterialDatePicker('setDate', moment());
+$('#txtFechaFiltro').bootstrapMaterialDatePicker({ format : 'YYYY-MM', lang : 'es', weekStart : 1 , time: false});
+
+
+//$('#txtFechaFiltro').val('<?= date('Y-m-d');?>');
 $.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST' }).done(function(resp) {
 	//console.log(resp)
 	$('#tbodyRegistros').html(resp);
@@ -213,7 +222,9 @@ $.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST' }).done(function(re
 });
 $('#btnFiltrarReporte').click(function() {
 	var fecha = moment($('#txtFechaFiltro').val(), 'YYYY-MM-DD');
-	if( fecha.isValid() ){
+	if( $('#sltUsuarios').val()!=-1 ){
+
+	}else if( fecha.isValid() ){
 		$.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
 	//console.log(resp)
 	$('#tbodyRegistros').html(resp);

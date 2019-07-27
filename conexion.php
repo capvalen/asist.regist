@@ -1,10 +1,10 @@
 
 <?php
-$server="localhost";
+$server="192.168.1.168";
 
 /* Net	*/
 $username="root";
-$password="";
+$password="Giordan23";
 $db='asistencias';
 
 global $conection;
