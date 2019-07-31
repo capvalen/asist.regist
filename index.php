@@ -171,13 +171,8 @@ $('#btnRegistrar').click(function() {
 				$('#imgPersonal').attr('src', 'images/noimg.jpg');
             $('#icono').removeClass('d-none');
             $('#h5Resultado').html(resp).removeClass('d-none');
-<<<<<<< HEAD
-				setTimeout(() => {
-					$('#txtDni').val('');
-=======
 				setTimeout(() => {
 					$('#txtDniRegistro').val('');
->>>>>>> ec0f5836fa041bb8588b8460165efe1d7a8a6c2a
 					$('#imgPersonal').attr('src', 'images/infocat.png');
 					$('#icono').addClass('d-none');
             	$('#h5Resultado').addClass('d-none');

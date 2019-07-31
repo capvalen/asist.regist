@@ -72,7 +72,7 @@ button:focus{
 			<button class="navbar-toggler ml-2" type="button" id="btnNuevoPersonal" title="Agregar personal" >
 			<span><i class="icofont-contact-add"></i></span>
 			</button>
-			<a href="paneljunto.php" title="Reporte mensual"><i class="icofont-address-book"></i></a>
+			<a class="navbar-toggler ml-2" href="panel.php" title="Reporte diario"><i class="icofont-address-book"></i></a>
 			<button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
 				<span><i class="icofont-toy-cat"></i></span>
 			</button>
@@ -85,21 +85,20 @@ button:focus{
     <div class="container">
       <h1 class="jumbotron-heading">Reporte mensual</h1>
       <div class="form-inline d-flex justify-content-center">
-			<select name="" id="input" class="form-control" required="required" id="sltUsuarios">
+			<select name="" class="form-control" required="required" id="sltUsuarios">
 				<?php include 'php/optListarUusuarios.php'; ?>
 			</select>
-			<input type="text" class="form-control text-center" id="txtFechaFiltro">
+			<input type="text" class="form-control text-center" id="txtFechaFiltro" placeholder="Periodo">
 			<button class="btn btn-outline-primary ml-3" id="btnFiltrarReporte"><i class="icofont-search-2"></i> Filtrar</button>
 		</div>
     </div>
   </section>
 	<section class="container-fluid">
 		<div class="table-responsive">
-		<table class="table table-hover">
+		<table class="table table-hover" id="tablaTareo">
 		<thead>
 			<tr>
-				<th>N°</th>
-				<th>Nombres</th>
+				<th>Fecha</th>
 				<th>Entrada día</th>
 				<th>Salida día</th>
 				<th>Entrada tarde</th>
@@ -107,7 +106,7 @@ button:focus{
 			</tr>
 		</thead>
 		<tbody id="tbodyRegistros">
-
+		
 		</tbody>
 		</table>
 		</div>
@@ -206,39 +205,6 @@ button:focus{
 //$('txtFechaFiltro').bootstrapMaterialDatePicker('setDate', moment());
 $('#txtFechaFiltro').bootstrapMaterialDatePicker({ format : 'YYYY-MM', lang : 'es', weekStart : 1 , time: false});
 
-
-//$('#txtFechaFiltro').val('<?= date('Y-m-d');?>');
-$.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST' }).done(function(resp) {
-	//console.log(resp)
-	$('#tbodyRegistros').html(resp);
-	$.ajax({url: 'php/listarRegistrosInternos.php', type: 'POST'}).done(function(resp) {
-		var data = JSON.parse(resp);
-		//console.log(data)
-		$.each( data, function (i, elem) {
-			//console.log(elem.idUsuario)
-			$(`tr[data-user=${elem.idUsuario}] td[data-reg="${elem.idHorario}"]`).text(moment(elem.regHora, 'HH:mm:ss').format('h:mm a'))
-		});
-	});
-});
-$('#btnFiltrarReporte').click(function() {
-	var fecha = moment($('#txtFechaFiltro').val(), 'YYYY-MM-DD');
-	if( $('#sltUsuarios').val()!=-1 ){
-
-	}else if( fecha.isValid() ){
-		$.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
-	//console.log(resp)
-	$('#tbodyRegistros').html(resp);
-	$.ajax({url: 'php/listarRegistrosInternos.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
-		var data = JSON.parse(resp);
-		//console.log(data)
-		$.each( data, function (i, elem) {
-			//console.log(elem.idUsuario)
-			$(`tr[data-user=${elem.idUsuario}] td[data-reg="${elem.idHorario}"]`).text(moment(elem.regHora, 'HH:mm:ss').format('h:mm a'))
-		});
-	});
-});
-	}
-});
 $('#btnListarPersonal').click(function() {
 	$('#modalListadoPersonal').modal('show');
 });
@@ -280,6 +246,89 @@ $('#btnBorrarPersona').click(function() {
 		}
 	});
 });
+$('#btnFiltrarReporte').click(function() {
+	$('#tablaTareo tbody').children().remove();
+	var meses = moment( $('#txtFechaFiltro').val(), "YYYY-MM").daysInMonth();
+	for (let index = 1; index <= meses; index++) {
+		var fechaEnJuego = moment($('#txtFechaFiltro').val()+'-'+index, 'YYYY-MM-D');
+		$('#tablaTareo tbody').append(`<tr data-fecha="${fechaEnJuego.format('YYYY-MM-DD')}">
+			<td class="tdFecha">${fechaEnJuego.format('DD/MM/YYYY')}</td>
+			<td class="tdDia"></td>
+			<td class="tdMedioDia"></td>
+			<td class="tdTarde"></td>
+			<td class="tdNoche"></td>
+		</tr>`);
+		if(index == meses){rellenarData(meses);}
+	}
+	
+});
+function rellenarData(meses) {
+	var textoHora= '';
+	$.ajax({url: 'php/listarRegistrosMensuales.php', type: 'POST', data: { idUsuario: $('#sltUsuarios').val(), fecha: $('#txtFechaFiltro').val() }}).done(function(resp) { //console.log(JSON.parse(resp))
+		$.each( JSON.parse(resp) , function(i, objeto){
+			var horaMarca =  moment(objeto.regHora, 'HH:mm:ss');
+			var horaOptima =  moment(objeto.horas, 'HH:mm:ss');
+			
+			switch (objeto.idHorario) {
+				case '1':
+					var horaDifiere = 0 - horaMarca.diff(horaOptima, 'minutes');;
+					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
+						if(horaAnalizar<10){
+							textoHora = ` <span class="text-success"> <span class="minSuma">0<span> min.</span>`;
+						}else{
+							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}<span> min.</span>`;
+						}
+					}
+					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdDia`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
+				
+				case '2': 
+					var horaDifiere = 0 - horaOptima.diff(horaMarca, 'minutes');;
+					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdMedioDia`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
+				
+				case '3':
+					var horaDifiere = 0 - horaMarca.diff(horaOptima, 'minutes');;
+					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
+						if(horaAnalizar<10){
+							textoHora = ` <span class="text-success"> <span class="minSuma">0<span> min.</span>`;
+						}else{
+							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}<span> min.</span>`;
+						}
+					}		
+					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdTarde`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
+				
+				case '4':
+					var horaDifiere = 0 - horaOptima.diff(horaMarca, 'minutes');;
+					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
+						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}<span> min.</span>`;
+					}
+					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdNoche`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
+				default: break;
+			}
+			//console.log(horaMarca.format('HH:mm') + '      ' + horaOptima.format('HH:mm') + '      ' +horaDifiere);
+			if(i == meses){rellenarFaltas();}
+		});
+	});
+}
+function rellenarFaltas() {
+	if($('.tdDia').html.lenght==0){
+		$(this).html('a')
+	}
+}
 </script>
 </body>
 </html>
