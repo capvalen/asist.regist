@@ -1,6 +1,6 @@
 
 <?php
-$server="192.168.1.168";
+$server="192.168.1.187";
 
 /* Net	*/
 $username="root";

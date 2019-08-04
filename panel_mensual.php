@@ -16,6 +16,7 @@ if (!isset($_COOKIE['ckUsuario'])){
    <title>Panel de Control de asistencias</title>
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
    <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css">
+   <link rel="stylesheet" href="css/colorsmaterial.css">
    <link rel="stylesheet" href="css/icofont.css">
 </head>
 <body>
@@ -88,7 +89,7 @@ button:focus{
 			<select name="" class="form-control" required="required" id="sltUsuarios">
 				<?php include 'php/optListarUusuarios.php'; ?>
 			</select>
-			<input type="text" class="form-control text-center" id="txtFechaFiltro" placeholder="Periodo">
+			<input type="text" class="form-control text-center ml-3" id="txtFechaFiltro" placeholder="Periodo">
 			<button class="btn btn-outline-primary ml-3" id="btnFiltrarReporte"><i class="icofont-search-2"></i> Filtrar</button>
 		</div>
     </div>
@@ -109,6 +110,25 @@ button:focus{
 		
 		</tbody>
 		</table>
+		<br>
+		<div class="container-fluid pb-5 mb-5">
+			<div class="row">
+				<div class="col">
+					<p><strong>Faltas en el día:</strong> <span class="spanFaltasDia"></span></p>
+					<p><strong>Descuento por falta día (S/ 35.00):</strong> <span class='spanMultFaltasDia'></span></p>
+					<p><strong>Suma de minutos tardanza día:</strong> <span id="spanSumMinutosDia"></span></p>
+					<p><strong>Descuento por tardanza día (S/ 0.20):</strong> <span id="spanMultMinutosDia"></span></p>
+				</div>
+				<div class="col">
+					<p><strong>Faltas en la tarde:</strong> <span class="spanFaltasNoche"></span></p>
+					<p><strong>Descuento por falta tarde (S/ 35.00):</strong> <span class='spanMultFaltasNoche'></span></p>
+					<p><strong>Suma de minutos tardanza tarde:</strong> <span id="spanSumMinutosTarde"></span></p>
+					<p><strong>Descuento por tardanza día (S/ 0.20):</strong> <span id="spanMultMinutosTarde"></span></p>
+				</div>
+			</div>
+		</div>
+		
+		
 		</div>
 	</section>
 </main>
@@ -265,7 +285,8 @@ $('#btnFiltrarReporte').click(function() {
 function rellenarData(meses) {
 	var textoHora= '';
 	$.ajax({url: 'php/listarRegistrosMensuales.php', type: 'POST', data: { idUsuario: $('#sltUsuarios').val(), fecha: $('#txtFechaFiltro').val() }}).done(function(resp) { //console.log(JSON.parse(resp))
-		$.each( JSON.parse(resp) , function(i, objeto){
+		var consolidado = JSON.parse(resp);
+		$.each( consolidado , function(i, objeto){
 			var horaMarca =  moment(objeto.regHora, 'HH:mm:ss');
 			var horaOptima =  moment(objeto.horas, 'HH:mm:ss');
 			
@@ -273,13 +294,13 @@ function rellenarData(meses) {
 				case '1':
 					var horaDifiere = 0 - horaMarca.diff(horaOptima, 'minutes');;
 					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
 						if(horaAnalizar<10){
-							textoHora = ` <span class="text-success"> <span class="minSuma">0<span> min.</span>`;
+							textoHora = ` <span class="text-success"> <span class="minSuma">0</span> min.</span>`;
 						}else{
-							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}<span> min.</span>`;
+							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}</span> min.</span>`;
 						}
 					}
 					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdDia`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
@@ -287,23 +308,23 @@ function rellenarData(meses) {
 				case '2': 
 					var horaDifiere = 0 - horaOptima.diff(horaMarca, 'minutes');;
 					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdMedioDia`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
 				
 				case '3':
 					var horaDifiere = 0 - horaMarca.diff(horaOptima, 'minutes');;
 					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
 						if(horaAnalizar<10){
-							textoHora = ` <span class="text-success"> <span class="minSuma">0<span> min.</span>`;
+							textoHora = ` <span class="text-success"> <span class="minSuma">0</span> min.</span>`;
 						}else{
-							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}<span> min.</span>`;
+							textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere+10}</span> min.</span>`;
 						}
 					}		
 					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdTarde`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
@@ -311,23 +332,67 @@ function rellenarData(meses) {
 				case '4':
 					var horaDifiere = 0 - horaOptima.diff(horaMarca, 'minutes');;
 					if(horaDifiere>=0){ horaDifiere = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-success"> +<span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					if(horaDifiere<0){ horaAnalizar = Math.abs(horaDifiere);
-						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}<span> min.</span>`;
+						textoHora = ` <span class="text-danger"> <span class="minSuma">${horaDifiere}</span> min.</span>`;
 					}
 					$(`#tablaTareo tr[data-fecha="${objeto.regFecha}"] .tdNoche`).html(moment(objeto.regHora, 'HH:mm:ss').format('hh:mm a') + textoHora ); break;
 				default: break;
 			}
 			//console.log(horaMarca.format('HH:mm') + '      ' + horaOptima.format('HH:mm') + '      ' +horaDifiere);
-			if(i == meses){rellenarFaltas();}
+			//if( i == Object.keys(consolidado).length ){ rellenarFaltas(); }
 		});
+		rellenarFaltas();
 	});
 }
 function rellenarFaltas() {
-	if($('.tdDia').html.lenght==0){
-		$(this).html('a')
-	}
+	var faltasDia = 0, faltasTardes=0, sumMinutosDia=0, sumMinutosTarde=0;
+	$.each( $('.tdDia') , function(i, objetoDia){
+		if($(objetoDia).html() == 0 ){
+			if( moment(moment().format('YYYY-MM-DD')).isBefore($(objetoDia).parent().attr('data-fecha'))  ){ return false; }else{
+				$(this).html('<span class="text-warning">Falta</span>');
+				faltasDia++;
+			}
+		}else{
+			var cantEvaluar = parseFloat($(objetoDia).find('.minSuma').text());
+			if(cantEvaluar<0){
+				cantEvaluar = Math.abs(cantEvaluar);
+				if(cantEvaluar >=30){
+					faltasDia++;
+				}else{
+				sumMinutosDia+= cantEvaluar;
+				}
+			}
+		}
+	});
+	$.each( $('.tdTarde') , function(i, objeto){
+		if($(objeto).html() == 0 ){
+			if( moment(moment().format('YYYY-MM-DD')).isBefore($(objeto).parent().attr('data-fecha'))  ){ return false; }else{
+				$(this).html('<span class="text-warning">Falta</span>');
+				faltasTardes++;
+			}
+		}else{
+			var cantEvaluarTarde = parseFloat($(objeto).find('.minSuma').text());
+			if(cantEvaluarTarde<0){
+				cantEvaluarTarde = Math.abs(cantEvaluarTarde);
+				if(cantEvaluarTarde >=30){
+					faltasTardes++;
+				}else{
+					sumMinutosTarde+= cantEvaluarTarde;
+				}
+			}
+		}
+	});
+	$('.spanFaltasDia').text(faltasDia);
+	$('.spanFaltasNoche').text(faltasTardes);
+	$('.spanMultFaltasDia').text("S/ "+parseFloat(faltasDia*35).toFixed(2));
+	$('.spanMultFaltasNoche').text("S/ "+parseFloat(faltasTardes*35).toFixed(2));
+	$('#spanSumMinutosDia').text(sumMinutosDia + ' min.');
+	$('#spanSumMinutosTarde').text(sumMinutosTarde + ' min.');
+	$('#spanMultMinutosDia').text( parseFloat(sumMinutosDia*0.2).toFixed(2))
+	$('#spanMultMinutosTarde').text( parseFloat(sumMinutosTarde*0.2).toFixed(2))
+
 }
 </script>
 </body>
