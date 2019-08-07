@@ -104,6 +104,7 @@ button:focus{
 				<th>Salida día</th>
 				<th>Entrada tarde</th>
 				<th>Salida noche</th>
+				<th>¿Almorzó?</th>
 			</tr>
 		</thead>
 		<tbody id="tbodyRegistros">
@@ -112,6 +113,11 @@ button:focus{
 		</table>
 		<br>
 		<div class="container-fluid pb-5 mb-5">
+			<div class="row">
+				<div class="col">
+					<p><strong>Total de almuerzos:</strong> <span id="spanAlmuerzos"></span></p>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col">
 					<p><strong>Faltas en el día:</strong> <span class="spanFaltasDia"></span></p>
@@ -277,6 +283,7 @@ $('#btnFiltrarReporte').click(function() {
 			<td class="tdMedioDia"></td>
 			<td class="tdTarde"></td>
 			<td class="tdNoche"></td>
+			<td class="tdAlmuerzo"></td>
 		</tr>`);
 		if(index == meses){rellenarData(meses);}
 	}
@@ -343,6 +350,7 @@ function rellenarData(meses) {
 			//console.log(horaMarca.format('HH:mm') + '      ' + horaOptima.format('HH:mm') + '      ' +horaDifiere);
 			//if( i == Object.keys(consolidado).length ){ rellenarFaltas(); }
 		});
+		rellenarAlmuerzos();
 		rellenarFaltas();
 	});
 }
@@ -393,6 +401,16 @@ function rellenarFaltas() {
 	$('#spanMultMinutosDia').text( parseFloat(sumMinutosDia*0.2).toFixed(2))
 	$('#spanMultMinutosTarde').text( parseFloat(sumMinutosTarde*0.2).toFixed(2))
 
+}
+function rellenarAlmuerzos() {
+	$.ajax({url: 'php/solicitarAlmuerzosMensual.php', type: 'POST', data: { idUser: $('#sltUsuarios').val(), periodo: $('#txtFechaFiltro').val()  }}).done(function(resp) {
+		//console.log(resp)
+		$.each( JSON.parse(resp) , function(index, almuerzo){
+			almuerzo.almFecha
+			$(`tr[data-fecha=${almuerzo.almFecha}] .tdAlmuerzo`).html(`<span class="text-success"><i class="icofont-check-circled"></i></span>`)
+			$('#spanAlmuerzos').text(index)
+		});
+	});
 }
 </script>
 </body>
