@@ -37,6 +37,37 @@ background-color: #fff;}
 button:focus{
 	outline: 5px auto #eee;
 }
+#overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75); /* Black background with opacity */
+    z-index: 1051; /* Specify a stack order in case you're using a different order for other elements */
+   /* Add a pointer on hover */
+}
+#overlay .text{position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 18px;
+    color: white;
+    user-select: none;
+    transform: translate(-50%,-50%);
+}
+#hojita{font-size: 36px; display: inline; animation: cargaData 6s ease infinite;}
+#pFrase{ display: inline; }
+#pFrase span{ font-size: 13px;}
+@keyframes cargaData {
+    0%  {color: #96f368;}
+    25%  {color: #f3dd68;}
+    50% {color: #f54239;}
+    75% {color: #c173ce;}
+    100% {color: #33dbdb;}
+}
 </style>
   <div class="collapse bg-dark" id="navbarHeader">
     <div class="container">
@@ -100,6 +131,7 @@ button:focus{
 				<th>Salida día</th>
 				<th>Entrada tarde</th>
 				<th>Salida noche</th>
+				<th>¿Almorzó?</th>
 			</tr>
 		</thead>
 		<tbody id="tbodyRegistros">
@@ -192,6 +224,9 @@ button:focus{
     </div>
   </div>
 </div>
+<div id="overlay">
+	<div class="text"><span id="hojita"><i class="icofont icofont-leaf"></i></span> <p id="pFrase"> Cargando los datos... <br> <span>«Pregúntate si lo que estás haciendo hoy <br> te acerca al lugar en el que quieres estar mañana» <br> Walt Disney</span></p></div>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -199,6 +234,7 @@ button:focus{
 <script src="js/moment.js"></script>
 <script>
 $('#txtFechaFiltro').val('<?= date('Y-m-d');?>');
+pantallaOver(true);
 $.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST' }).done(function(resp) {
 	//console.log(resp)
 	$('#tbodyRegistros').html(resp);
@@ -210,22 +246,42 @@ $.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST' }).done(function(re
 			$(`tr[data-user=${elem.idUsuario}] td[data-reg="${elem.idHorario}"]`).text(moment(elem.regHora, 'HH:mm:ss').format('h:mm a'))
 		});
 	});
+	$.ajax({url: 'php/listarAlmuerzos.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val() }}).done(function(resp) {
+		var data = JSON.parse(resp);
+		//console.log(data)
+		$.each( data, function (i, alm) {
+			//console.log(alm)
+			$(`tr[data-user=${alm.idUsuario}] .form-check-input`).prop('checked', true)
+		});
+		pantallaOver(false);
+	});
 });
 $('#btnFiltrarReporte').click(function() {
+pantallaOver(true);
 	var fecha = moment($('#txtFechaFiltro').val(), 'YYYY-MM-DD');
 	if( fecha.isValid() ){
 		$.ajax({url: 'php/listarRegistrosPorFecha.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
 	//console.log(resp)
-	$('#tbodyRegistros').html(resp);
-	$.ajax({url: 'php/listarRegistrosInternos.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
-		var data = JSON.parse(resp);
-		//console.log(data)
-		$.each( data, function (i, elem) {
-			//console.log(elem.idUsuario)
-			$(`tr[data-user=${elem.idUsuario}] td[data-reg="${elem.idHorario}"]`).text(moment(elem.regHora, 'HH:mm:ss').format('h:mm a'))
+			$('#tbodyRegistros').html(resp);
+			$.ajax({url: 'php/listarRegistrosInternos.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val()} }).done(function(resp) {
+			var data = JSON.parse(resp);
+			//console.log(data)
+			$.each( data, function (i, elem) {
+				//console.log(elem.idUsuario)
+				$(`tr[data-user=${elem.idUsuario}] td[data-reg="${elem.idHorario}"]`).text(moment(elem.regHora, 'HH:mm:ss').format('h:mm a'))
+			});
+		});
+		$.ajax({url: 'php/listarAlmuerzos.php', type: 'POST', data:{fecha: $('#txtFechaFiltro').val() }}).done(function(resp) {
+			var data = JSON.parse(resp);
+			//console.log(data)
+			$.each( data, function (i, alm) {
+				console.log(alm)
+				$(`tr[data-user=${alm.idUsuario}] .form-check-input`).prop('checked', true)
+			});
+			pantallaOver(false);
 		});
 	});
-});
+	
 	}
 });
 $('#btnListarPersonal').click(function() {
@@ -267,6 +323,19 @@ $('#btnBorrarPersona').click(function() {
 		if($.trim(resp)=='todo ok'){
 			location.reload();
 		}
+	});
+});
+function pantallaOver(tipo) {
+	if(tipo){$('#overlay').css('display', 'initial');}
+	else{ $('#overlay').css('display', 'none'); }
+}
+$('#tbodyRegistros').on('click', '.form-check-input', function (e) {
+	pantallaOver(true);
+	var idUser = $(this).parent().parent().attr('data-user');
+	
+	$.ajax({url: 'php/updateAlmuerzo.php', type: 'POST', data: { idUser: idUser, fecha: $('#txtFechaFiltro').val(), estado: $(this).prop('checked') }}).done(function(resp) {
+		console.log(resp)
+		pantallaOver(false);
 	});
 });
 </script>

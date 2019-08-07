@@ -10,7 +10,7 @@ else{ $fecha = $_POST['fecha'];}
 $i=1;
 $sql="SELECT u.idUsuario, u.usuApellido, u.usuNombre FROM `horario_registros` hr
 inner join usuarios u on hr.idUsuario = u.idUsuario
-where regFecha = '{$fecha}' and regActivo=1
+where /* regFecha = '{$fecha}' and */ regActivo=1
 group by u.idUsuario
 order by u.usuNombre asc;";
 $resultado=$cadena->query($sql);
@@ -27,7 +27,10 @@ if( $resultado->num_rows==0){ ?>
 			<td data-reg="1">-</td>
 			<td data-reg="2">-</td>
 			<td data-reg="3">-</td>
-			<td data-reg="4">-</td>
+			<td data-reg="4">-</td>	
+			<td class="text-center" data-reg="alm">
+				<input class="form-check-input" type="checkbox" value="" id="">
+			</td>	
 	  </tr>
 	  <?php $i++;
 	}
