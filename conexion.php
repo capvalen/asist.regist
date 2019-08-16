@@ -1,5 +1,5 @@
 <?php
-$server="192.168.1.187";
+$server="192.168.1.168";
 
 /* Net	*/
 $username="root";

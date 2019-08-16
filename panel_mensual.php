@@ -277,7 +277,8 @@ $('#btnFiltrarReporte').click(function() {
 	var meses = moment( $('#txtFechaFiltro').val(), "YYYY-MM").daysInMonth();
 	for (let index = 1; index <= meses; index++) {
 		var fechaEnJuego = moment($('#txtFechaFiltro').val()+'-'+index, 'YYYY-MM-D');
-		$('#tablaTareo tbody').append(`<tr data-fecha="${fechaEnJuego.format('YYYY-MM-DD')}">
+		if (fechaEnJuego.format('d')!=0){
+			$('#tablaTareo tbody').append(`<tr data-fecha="${fechaEnJuego.format('YYYY-MM-DD')}">
 			<td class="tdFecha">${fechaEnJuego.format('DD/MM/YYYY')}</td>
 			<td class="tdDia"></td>
 			<td class="tdMedioDia"></td>
@@ -286,6 +287,8 @@ $('#btnFiltrarReporte').click(function() {
 			<td class="tdAlmuerzo"></td>
 		</tr>`);
 		if(index == meses){rellenarData(meses);}
+		}
+
 	}
 	
 });

@@ -10,7 +10,7 @@ else{ $fecha = $_POST['fecha'];}
 $i=1;
 $sql="SELECT u.idUsuario, u.usuApellido, u.usuNombre FROM `horario_registros` hr
 inner join usuarios u on hr.idUsuario = u.idUsuario
-where /* regFecha = '{$fecha}' and */ regActivo=1
+where /* regFecha = '{$fecha}' and */ regActivo=1 and usuEstadoActivo =1
 group by u.idUsuario
 order by u.usuNombre asc;";
 $resultado=$cadena->query($sql);
