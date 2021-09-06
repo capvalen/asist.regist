@@ -1,0 +1,1 @@
+CREATE TABLE `almuerzos` ( `idAlmuerzo` INT NOT NULL AUTO_INCREMENT , `idUsuario` INT NOT NULL , `almFecha` DATETIME NOT NULL , `almActivo` BOOLEAN NOT NULL , PRIMARY KEY (`idAlmuerzo`)) ENGINE = InnoDB;
